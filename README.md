@@ -1,18 +1,17 @@
 # Hibernate Ecommerce
 
 A Java-based Ecommerce application developed using Hibernate ORM and MySQL.
-The project demonstrates entity mapping, relationships, CRUD operations, and
-database persistence using Hibernate.
+The project demonstrates entity mapping, relationships, CRUD operations, and database persistence using Hibernate.
 
 ## Technologies Used
 
-- Java 17
-- Hibernate ORM 6.5.2
-- Jakarta Persistence API
-- MySQL
-- Maven
-- BCrypt for password hashing
-- Eclipse IDE
+* Java 17
+* Hibernate ORM 6.5.2
+* Jakarta Persistence API
+* MySQL
+* Maven
+* BCrypt for password hashing
+* Eclipse IDE
 
 ## Project Structure
 
@@ -49,253 +48,368 @@ hibernate-ecommerce
 ├── pom.xml
 ├── schema.sql
 └── README.md
-Entity Relationships
+```
 
-The project contains the following entities:
+## Entity Relationships
 
-Category
-Primary key: id
-Auto-generated ID
-Unique and non-null name
-Description
-One-to-Many relationship with Product
-Product
-Primary key: id
-Auto-generated ID
-Non-null product name
-Decimal price
-Stock quantity
-Many-to-One relationship with Category
-Users
-Primary key: id
-Auto-generated ID
-Unique and non-null username
-Unique and non-null email
-Hashed password
-Role: ADMIN or CUSTOMER
-One-to-Many relationship with Orders
-Orders
-Primary key: id
-Auto-generated ID
-Order date
-Total amount
-Many-to-One relationship with Users
-One-to-Many relationship with OrderDetails
-OrderDetails
-Primary key: id
-Auto-generated ID
-Quantity
-Unit price
-Many-to-One relationship with Orders
-Many-to-One relationship with Product
-Relationship Diagram
-Category
-   │
-   │ One-to-Many
-   ▼
-Product
-   │
-   │ Many-to-One
-   ▼
-OrderDetails
-   ▲
-   │ Many-to-One
-   │
-Orders
-   ▲
-   │ Many-to-One
-   │
-Users
-Database Configuration
+### Category
 
-The project uses MySQL database named:
+The Category entity represents product categories.
 
-ecommerce
+* Primary key: `id`
+* ID is automatically generated
+* `name` is unique and cannot be null
+* Contains a description
+* One Category can contain multiple Products
 
-Default JDBC URL:
+Relationship: **One-to-Many**
 
-jdbc:mysql://localhost:3306/ecommerce
+Category → Products
 
-Database configuration is stored in:
+### Product
 
-src/main/resources/hibernate.cfg.xml
+The Product entity represents products available in the ecommerce system.
 
-Before running the project, make sure:
+* Primary key: `id`
+* ID is automatically generated
+* Product name cannot be null
+* Price is stored using `BigDecimal`
+* Contains stock quantity
+* Each Product belongs to one Category
 
-MySQL server is running.
-The ecommerce database exists.
-MySQL username and password are correctly configured in
-hibernate.cfg.xml.
+Relationship: **Many-to-One**
 
-The database schema is also provided in:
+Product → Category
 
-schema.sql
-Maven Dependencies
+### Users
 
-The project uses the following dependencies:
+The Users entity represents customers and administrators.
 
-Hibernate Core
-MySQL Connector/J
-Jakarta Persistence API
-BCrypt
-SLF4J Simple
+* Primary key: `id`
+* ID is automatically generated
+* Username is unique and cannot be null
+* Email is unique and cannot be null
+* Password is stored using BCrypt hashing
+* Role can be `ADMIN` or `CUSTOMER`
+* One User can have multiple Orders
 
-All dependencies are configured in:
+Relationship: **One-to-Many**
 
-pom.xml
-How to Run
-1. Clone the Repository
-git clone <your-github-repository-url>
-2. Open the Project in Eclipse
+User → Orders
 
-Import the project as an existing Maven project.
+### Orders
 
-3. Configure MySQL
+The Orders entity represents customer orders.
+
+* Primary key: `id`
+* ID is automatically generated
+* Contains order date
+* Contains total amount
+* Each Order belongs to one User
+* One Order can contain multiple OrderDetails
+
+Relationships:
+
+* Many-to-One with Users
+* One-to-Many with OrderDetails
+
+### OrderDetails
+
+The OrderDetails entity represents individual products included in an order.
+
+* Primary key: `id`
+* ID is automatically generated
+* Contains quantity
+* Contains unit price
+* Each OrderDetail belongs to one Order
+* Each OrderDetail refers to one Product
+
+Relationships:
+
+* Many-to-One with Orders
+* Many-to-One with Products
+
+## Relationship Overview
+
+The main entity relationship flow is:
+
+**Category → Product → OrderDetails → Orders → Users**
+
+The relationships are implemented using JPA annotations such as `@OneToMany`, `@ManyToOne`, `@JoinColumn`, and `@Enumerated`.
+
+## Database Configuration
+
+The project uses MySQL as the relational database.
+
+Database name:
+
+`ecommerce`
+
+JDBC URL:
+
+`jdbc:mysql://localhost:3306/ecommerce`
+
+Hibernate configuration is stored in:
+
+`src/main/resources/hibernate.cfg.xml`
+
+Hibernate automatically creates or updates the required database tables using the `hibernate.hbm2ddl.auto` property.
+
+The project also contains `schema.sql` with the SQL definitions for the required database tables.
+
+## Maven Dependencies
+
+The project uses Maven for dependency management.
+
+The main dependencies are:
+
+* Hibernate Core
+* MySQL Connector/J
+* Jakarta Persistence API
+* BCrypt
+* SLF4J Simple
+
+All dependencies are configured in `pom.xml`.
+
+## Setup Instructions
+
+### 1. Clone the Repository
+
+Clone the project from GitHub:
+
+```bash
+git clone https://github.com/tanusree-sadhukhan/hibernate-ecommerce.git
+```
+
+Open the project in Eclipse or another Java IDE.
+
+### 2. Configure MySQL
+
+Make sure MySQL is installed and running on port `3306`.
 
 Create the database:
 
+```sql
 CREATE DATABASE ecommerce;
+```
 
-Update the MySQL username and password in:
+### 3. Configure Database Credentials
 
-src/main/resources/hibernate.cfg.xml
-4. Update Maven Project
+Open:
+
+`src/main/resources/hibernate.cfg.xml`
+
+Update the MySQL username and password according to your local MySQL installation.
+
+Do not commit real database passwords or other sensitive credentials to a public repository.
+
+### 4. Update Maven Project
 
 In Eclipse:
 
-Right Click Project
-→ Maven
-→ Update Project
-5. Run CRUD Tests
+**Right Click Project → Maven → Update Project**
 
-The project contains separate test classes for CRUD operations:
+Maven will download the required dependencies specified in `pom.xml`.
 
-TestHibernate.java
-TestProductCRUD.java
-TestUserCRUD.java
-TestOrderCRUD.java
+### 5. Run the Tests
 
-These tests verify Create, Read, Update, and Delete operations.
+The test classes are located inside:
 
-6. Run Relationship Tests
+`src/main/java/com/ecommerce/test/`
 
-First run:
+Run each test class as a Java Application.
 
-TestRelationshipData.java
+## CRUD Testing
 
-Then run:
+The project contains separate test classes for CRUD operations.
 
-TestRelationships.java
+### Category CRUD
 
-This verifies the relationships between:
+`TestHibernate.java`
 
-Users → Orders
-Orders → OrderDetails
-OrderDetails → Product
-Product → Category
-CRUD Operations Tested
+This test verifies:
 
-The project successfully tests:
+* Create Category
+* Read Category
+* Update Category
+* Delete Category
 
-Create
-Read
-Update
-Delete
+### Product CRUD
 
-for the following entities:
+`TestProductCRUD.java`
 
-Category
-Product
-Users
-Orders
-OrderDetails
-Hibernate Configuration
+This test verifies:
 
-Hibernate manages the database schema using:
+* Create Product
+* Read Product
+* Update Product
+* Delete Product
 
-hibernate.hbm2ddl.auto=update
+The Product is also associated with a Category during the test.
 
-SQL statements are displayed during testing using:
+### User CRUD
 
-hibernate.show_sql=true
+`TestUserCRUD.java`
 
-The project uses HibernateUtil.java to create and manage the Hibernate
-SessionFactory.
+This test verifies:
 
-Relationship Testing
+* Create User
+* Read User
+* Update User
+* Delete User
 
-The project verifies the following entity relationships:
+It also verifies BCrypt password hashing.
 
-Users → Orders
+### Order and OrderDetails CRUD
 
-One user can have multiple orders.
+`TestOrderCRUD.java`
 
-Orders → Users
+This test verifies:
 
-Each order belongs to one user.
+* Create User
+* Create Category
+* Create Products
+* Create Order
+* Create multiple OrderDetails
+* Read Order
+* Read related User and Products
+* Update Order
+* Delete Order
+* Cascade deletion of OrderDetails
+* Cleanup of temporary test data
 
-Orders → OrderDetails
+## Relationship Testing
 
-One order can contain multiple order details.
+Relationship testing is performed using two test classes:
 
-OrderDetails → Product
+* `TestRelationshipData.java`
+* `TestRelationships.java`
 
-Each order detail refers to one product.
+`TestRelationshipData.java` creates persistent test data consisting of:
 
-Product → Category
+* One Category
+* Two Products
+* One User
+* One Order
+* Two OrderDetails
 
-Each product belongs to one category.
+`TestRelationships.java` retrieves the stored data and verifies the entity relationships.
 
-Testing Results
+The test verifies that:
 
-The Hibernate CRUD and relationship tests were successfully executed
-using MySQL.
+* An Order is connected to a User
+* An Order contains multiple OrderDetails
+* Each OrderDetail is connected to a Product
+* Each Product is connected to a Category
+* Product quantity is correctly persisted
+* Product unit price is correctly persisted
 
-Successful test results include:
+## Hibernate Configuration
 
-Category CRUD testing completed successfully!
+Hibernate session management is handled by:
 
-Product CRUD testing completed successfully!
+`HibernateUtil.java`
 
-User CRUD testing completed successfully!
+The utility class creates and manages the Hibernate `SessionFactory`.
 
-Order and OrderDetails testing completed successfully!
+The project uses:
 
-All entity relationships tested successfully!
-Cascade and Fetching
+* Hibernate ORM
+* MySQL database connection
+* JPA entity annotations
+* Automatic schema update
+* SQL logging
+* Entity mapping through `hibernate.cfg.xml`
 
-The project uses Hibernate/JPA cascade and fetching strategies for
-entity relationships.
+## Cascade and Fetching
 
-Orders use cascading for their OrderDetails, allowing associated
-OrderDetails to be removed when an Order is deleted.
+The project uses Hibernate/JPA cascade operations and lazy fetching where appropriate.
 
-The Users → Orders and Orders → OrderDetails collections use lazy
-fetching.
+The User-to-Orders and Order-to-OrderDetails relationships use cascade and lazy fetching.
 
-Security
+This allows related records to be managed efficiently while maintaining the entity relationships.
 
-User passwords are intended to be stored using BCrypt hashing rather
-than plain-text passwords.
+## Security
 
-For security reasons, database credentials should not be committed to
-a public GitHub repository.
+User passwords are not stored as plain text.
 
-Conclusion
+The project uses BCrypt to hash passwords before storing them in the database.
 
-This project demonstrates the implementation of an Ecommerce data model
-using Hibernate ORM and MySQL.
+Example:
 
-It covers:
+```java
+String hashedPassword = BCrypt.hashpw(
+    "password123",
+    BCrypt.gensalt()
+);
+```
 
-Entity creation
-Primary key generation
-JPA/Hibernate annotations
-One-to-Many relationships
-Many-to-One relationships
-CRUD operations
-Cascade operations
-Lazy fetching
-MySQL database persistence
-Hibernate configuration
-Relationship testing
+Only the generated BCrypt hash is stored in the database.
+
+## Database Tables
+
+Hibernate creates the following tables:
+
+* `categories`
+* `products`
+* `users`
+* `orders`
+* `order_details`
+
+Foreign-key relationships are maintained between the related tables.
+
+## Testing Results
+
+The following tests were successfully executed:
+
+| Test                                | Result |
+| ----------------------------------- | ------ |
+| Category CRUD                       | Passed |
+| Product CRUD                        | Passed |
+| User CRUD                           | Passed |
+| Order CRUD                          | Passed |
+| OrderDetails CRUD                   | Passed |
+| Category → Product relationship     | Passed |
+| User → Orders relationship          | Passed |
+| Order → OrderDetails relationship   | Passed |
+| OrderDetails → Product relationship | Passed |
+| Product → Category relationship     | Passed |
+| BCrypt password hashing             | Passed |
+
+The Hibernate `SessionFactory` was successfully created and the required database tables were generated successfully.
+
+## Important Files
+
+| File                 | Purpose                                |
+| -------------------- | -------------------------------------- |
+| `Category.java`      | Category entity                        |
+| `Product.java`       | Product entity                         |
+| `Users.java`         | User entity                            |
+| `Orders.java`        | Order entity                           |
+| `OrderDetails.java`  | Order details entity                   |
+| `Role.java`          | User role enumeration                  |
+| `HibernateUtil.java` | Hibernate SessionFactory configuration |
+| `hibernate.cfg.xml`  | Hibernate and database configuration   |
+| `schema.sql`         | Database schema                        |
+| `pom.xml`            | Maven dependencies                     |
+| `README.md`          | Project documentation                  |
+
+## Conclusion
+
+This project demonstrates a complete Hibernate-based Ecommerce persistence layer using Java, JPA annotations, MySQL, and Maven.
+
+The project implements:
+
+* Entity mapping
+* Primary keys and automatically generated IDs
+* One-to-Many relationships
+* Many-to-One relationships
+* CRUD operations
+* Order and OrderDetails management
+* Cascade operations
+* Lazy fetching
+* BCrypt password hashing
+* MySQL database persistence
+* Relationship testing
+
+The project is structured for easy setup, testing, and further development.
